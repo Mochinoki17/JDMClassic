@@ -1,39 +1,11 @@
-// github-storage.js - ULTIMATE GITHUB PAGES FIX
+// github-storage.js - MEMORY-ONLY FOR GITHUB PAGES
 class GitHubPagesStorage {
     constructor() {
-        console.log('🚀 GitHubPagesStorage initialized - ULTIMATE FIX');
-        this.storageLayers = [
-            this.tryWindowName.bind(this),
-            this.tryLocalStorage.bind(this),
-            this.trySessionStorage.bind(this),
-            this.tryURLStorage.bind(this)
-        ];
-        
+        console.log('🚀 GitHubPagesStorage - MEMORY MODE (GitHub Pages Compatible)');
+        this.data = {}; // Memory storage only
         this.domainKey = this.getDomainKey();
         console.log('🔑 Domain key:', this.domainKey);
-        this.fallbackStorage = {};
-        this.loadURLData();
-        
-        // Test storage immediately
-        this.testStorage();
-    }
-    
-    testStorage() {
-        console.log('🧪 Testing storage layers...');
-        const testData = { test: 'data', timestamp: Date.now() };
-        
-        // Test each layer
-        this.storageLayers.forEach(layer => {
-            const layerName = layer.name.replace('try', '');
-            try {
-                layer('testKey', testData);
-                const retrieved = this.getFromLayer(layer, 'testKey');
-                console.log(`✅ ${layerName}:`, retrieved ? 'WORKING' : 'FAILED');
-                layer('testKey', null); // Cleanup
-            } catch (e) {
-                console.log(`❌ ${layerName}: FAILED -`, e.message);
-            }
-        });
+        this.loadFromPersistentFallback();
     }
     
     getDomainKey() {
@@ -43,191 +15,94 @@ class GitHubPagesStorage {
         return `jdm_${repo.replace(/[^a-zA-Z0-9]/g, '_')}`;
     }
     
-    tryLocalStorage(key, value) {
+    loadFromPersistentFallback() {
+        // Try to load from any persistent source on page load
         try {
-            const fullKey = `${this.domainKey}_${key}`;
-            if (value === null) {
-                localStorage.removeItem(fullKey);
-                return true;
-            } else {
-                localStorage.setItem(fullKey, JSON.stringify(value));
-                return true;
-            }
-        } catch (e) {
-            return false;
-        }
-    }
-    
-    trySessionStorage(key, value) {
-        try {
-            const fullKey = `${this.domainKey}_${key}`;
-            if (value === null) {
-                sessionStorage.removeItem(fullKey);
-                return true;
-            } else {
-                sessionStorage.setItem(fullKey, JSON.stringify(value));
-                return true;
-            }
-        } catch (e) {
-            return false;
-        }
-    }
-    
-    tryWindowName(key, value) {
-        try {
-            let data = {};
+            // Try window.name first
             if (window.name && window.name !== '') {
                 try {
-                    data = JSON.parse(window.name);
+                    const savedData = JSON.parse(window.name);
+                    if (savedData && savedData[this.domainKey]) {
+                        this.data = { ...savedData[this.domainKey] };
+                        console.log('📥 Loaded from window.name:', this.data);
+                        return;
+                    }
                 } catch (e) {
-                    data = {};
+                    // Ignore parse errors
                 }
             }
             
-            const fullKey = `${this.domainKey}_${key}`;
-            
-            if (value === null) {
-                delete data[fullKey];
-            } else {
-                data[fullKey] = value;
+            // Try localStorage as backup
+            const localStorageData = localStorage.getItem(this.domainKey);
+            if (localStorageData) {
+                this.data = JSON.parse(localStorageData);
+                console.log('📥 Loaded from localStorage:', this.data);
             }
-            
-            window.name = JSON.stringify(data);
-            return true;
         } catch (e) {
-            return false;
+            console.log('No persistent data found, starting fresh');
         }
     }
     
-    tryURLStorage(key, value) {
-        if (key === 'jdmCart' && value && Array.isArray(value)) {
-            try {
-                const compressed = btoa(JSON.stringify(value));
-                if (compressed.length < 1500) {
-                    const newUrl = `${window.location.pathname}#cart=${compressed}`;
-                    window.history.replaceState(null, '', newUrl);
-                    return true;
-                }
-            } catch (e) {
-                // Ignore URL errors
-            }
+    saveToPersistentFallback() {
+        // Try to save to persistent storage
+        try {
+            // Save to window.name (most reliable on GitHub)
+            const saveData = {};
+            saveData[this.domainKey] = this.data;
+            window.name = JSON.stringify(saveData);
+        } catch (e) {
+            // Ignore errors
         }
-        return false;
-    }
-    
-    loadURLData() {
-        const hash = window.location.hash;
-        const match = hash.match(/cart=([^&]+)/);
-        if (match) {
-            try {
-                const cartData = JSON.parse(atob(match[1]));
-                this.setItem('jdmCart', cartData);
-            } catch (e) {
-                // Ignore parse errors
-            }
+        
+        try {
+            // Also try localStorage
+            localStorage.setItem(this.domainKey, JSON.stringify(this.data));
+        } catch (e) {
+            // Ignore errors
         }
     }
     
     setItem(key, value) {
-        console.log(`💽 SET: ${key}`, value);
+        console.log(`💾 SAVING: ${key}`, value);
+        this.data[key] = value;
+        this.saveToPersistentFallback();
+        console.log(`✅ SAVED: ${key} to MEMORY`);
         
-        let saved = false;
-        for (const layer of this.storageLayers) {
-            if (layer(key, value)) {
-                console.log(`✅ ${key} saved via ${layer.name}`);
-                saved = true;
-                break;
-            }
-        }
-        
-        // Memory fallback
-        if (!saved) {
-            const fullKey = `${this.domainKey}_${key}`;
-            this.fallbackStorage[fullKey] = value;
-            console.log(`🔄 ${key} saved to MEMORY`);
-        }
+        // Verify it was saved
+        const verify = this.data[key];
+        console.log(`🔍 VERIFY: ${key} =`, verify);
     }
     
     getItem(key) {
-        console.log(`🔍 GET: ${key}`);
-        
-        // Try memory first
-        const memoryKey = `${this.domainKey}_${key}`;
-        if (this.fallbackStorage[memoryKey] !== undefined) {
-            console.log(`✅ ${key} from MEMORY`);
-            return this.fallbackStorage[memoryKey];
-        }
-        
-        // Try storage layers
-        for (let i = 0; i < this.storageLayers.length; i++) {
-            try {
-                const value = this.getFromLayer(this.storageLayers[i], key);
-                if (value !== null && value !== undefined) {
-                    console.log(`✅ ${key} from ${this.storageLayers[i].name}`);
-                    return value;
-                }
-            } catch (e) {
-                // Continue to next layer
-            }
-        }
-        
-        console.log(`❌ ${key} NOT FOUND`);
-        return null;
-    }
-    
-    getFromLayer(layer, key) {
-        const fullKey = `${this.domainKey}_${key}`;
-        
-        if (layer === this.tryURLStorage && key === 'jdmCart') {
-            const hash = window.location.hash;
-            const match = hash.match(/cart=([^&]+)/);
-            if (match) {
-                return JSON.parse(atob(match[1]));
-            }
-            return null;
-        }
-        
-        if (layer === this.tryWindowName) {
-            if (window.name && window.name !== '') {
-                try {
-                    const data = JSON.parse(window.name);
-                    return data[fullKey] || null;
-                } catch (e) {
-                    return null;
-                }
-            }
-            return null;
-        }
-        
-        if (layer === this.tryLocalStorage) {
-            const item = localStorage.getItem(fullKey);
-            return item ? JSON.parse(item) : null;
-        }
-        
-        if (layer === this.trySessionStorage) {
-            const item = sessionStorage.getItem(fullKey);
-            return item ? JSON.parse(item) : null;
-        }
-        
-        return null;
+        console.log(`🔍 GETTING: ${key}`);
+        const value = this.data[key] || null;
+        console.log(`📖 RETRIEVED: ${key} =`, value);
+        return value;
     }
     
     removeItem(key) {
-        console.log(`🗑️ REMOVE: ${key}`);
-        for (const layer of this.storageLayers) {
-            layer(key, null);
-        }
-        const memoryKey = `${this.domainKey}_${key}`;
-        delete this.fallbackStorage[memoryKey];
+        console.log(`🗑️ REMOVING: ${key}`);
+        delete this.data[key];
+        this.saveToPersistentFallback();
     }
     
     clear() {
-        console.log('🔥 CLEAR ALL');
-        const keys = ['jdmCart', 'jdmCurrentUser', 'jdmLoggedIn', 'jdmUsers', 'jdmPurchases', 'jdmUserProfiles'];
-        keys.forEach(key => this.removeItem(key));
-        this.fallbackStorage = {};
+        console.log('🔥 CLEARING ALL DATA');
+        this.data = {};
+        this.saveToPersistentFallback();
+    }
+    
+    // Debug method to see all stored data
+    debug() {
+        console.log('🔍 STORAGE DEBUG:');
+        console.log('All data:', this.data);
+        console.log('Keys:', Object.keys(this.data));
+        return this.data;
     }
 }
 
 // Create global instance
 const storage = new GitHubPagesStorage();
+
+// Make debug available globally
+window.debugStorage = () => storage.debug();
