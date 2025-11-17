@@ -1,4 +1,4 @@
-// Login page specific functionality
+// Login page specific functionality - JSON STORAGE VERSION
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
   
@@ -30,8 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 2000);
     }
 
-    // Update navigation after login/signup
     if (typeof updateAuthNavigation === 'function') {
       updateAuthNavigation();
     }
-  });
+});

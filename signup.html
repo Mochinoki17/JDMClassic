@@ -68,7 +68,8 @@
     <p>© 2025 JDM Classic Showroom</p>
   </footer>
 
-  <script src="js/github-storage.js"></script>
+  <script src="js/json-storage.js"></script>
+  <script src="utility-functions.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/login-modal.js"></script>
   <script src="js/cart-system.js"></script>
@@ -90,87 +91,5 @@
       });
   </script>
 
-  <!-- EMERGENCY STORAGE FALLBACK -->
-<script>
-  // Nuclear option - if storage is broken, create a simple one
-  if (typeof storage === 'undefined' || !storage.setItem) {
-      console.log('🚨 EMERGENCY: Creating simple storage fallback');
-      
-      // Simple memory storage with persistence attempt
-      const simpleStorage = {
-          data: {},
-          setItem: function(key, value) {
-              console.log('🚨 EMERGENCY SAVE:', key, value);
-              this.data[key] = value;
-              
-              // Try to persist
-              try {
-                  localStorage.setItem(key, JSON.stringify(value));
-              } catch (e) {
-                  console.log('🚨 LocalStorage failed, using memory only');
-              }
-          },
-          getItem: function(key) {
-              // Try localStorage first
-              try {
-                  const item = localStorage.getItem(key);
-                  if (item) return JSON.parse(item);
-              } catch (e) {
-                  // Fall back to memory
-              }
-              return this.data[key] || null;
-          },
-          removeItem: function(key) {
-              delete this.data[key];
-              try {
-                  localStorage.removeItem(key);
-              } catch (e) {}
-          },
-          debug: function() {
-              console.log('🚨 EMERGENCY STORAGE DATA:', this.data);
-              return this.data;
-          }
-      };
-      
-      window.storage = simpleStorage;
-      console.log('🚨 EMERGENCY STORAGE CREATED');
-  }
-
-  // Test emergency storage
-  console.log('🧪 FINAL STORAGE TEST:', window.storage ? 'READY' : 'FAILED');
-  if (window.storage) {
-      window.storage.setItem('test', { working: true, timestamp: Date.now() });
-      const testResult = window.storage.getItem('test');
-      console.log('🧪 STORAGE TEST RESULT:', testResult);
-  }
-  </script>
-
-  <!-- GUARANTEED STORAGE FALLBACK -->
-  <script>
-  // This WILL work no matter what
-  window.storage = {
-      data: {},
-      setItem: function(key, value) {
-          console.log('💾 STORAGE SAVE:', key, value);
-          this.data[key] = value;
-          return true;
-      },
-      getItem: function(key) {
-          const value = this.data[key] || null;
-          console.log('📖 STORAGE GET:', key, value);
-          return value;
-      },
-      removeItem: function(key) {
-          console.log('🗑️ STORAGE REMOVE:', key);
-          delete this.data[key];
-      },
-      clear: function() {
-          console.log('🔥 STORAGE CLEAR');
-          this.data = {};
-      }
-  };
-
-  console.log('✅ STORAGE SYSTEM READY - Guaranteed memory storage');
-  </script>
 </body>
 </html>

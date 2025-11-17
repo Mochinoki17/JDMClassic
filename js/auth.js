@@ -1,4 +1,4 @@
-// Authentication functions
+// Authentication functions - UPDATED FOR JSON STORAGE
 function showCustomAlert(message) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -19,9 +19,9 @@ function showCustomAlert(message) {
     
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
-  }
+}
   
-  function showSuccessAlert(message) {
+function showSuccessAlert(message) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.style.display = 'flex';
@@ -41,17 +41,17 @@ function showCustomAlert(message) {
     
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
-  }
+}
   
-  function isLoggedIn() {
+function isLoggedIn() {
     return storage.getItem('jdmLoggedIn') === 'true';
-  }
+}
   
-  function getCurrentUser() {
+function getCurrentUser() {
     return storage.getItem('jdmCurrentUser');
-  }
+}
 
-  function updateAuthNavigation() {
+function updateAuthNavigation() {
     const authLink = document.getElementById('authLink');
     if (!authLink) return;
     
@@ -65,7 +65,6 @@ function showCustomAlert(message) {
       authLink.href = '#';
       authLink.onclick = function(e) {
         e.preventDefault();
-        // This will be handled by login-modal.js
         const loginModal = document.getElementById('loginModal');
         if (loginModal) {
           loginModal.style.display = 'flex';
@@ -75,9 +74,9 @@ function showCustomAlert(message) {
         }
       };
     }
-  }
+}
   
-  function handleLogout(e) {
+function handleLogout(e) {
     e.preventDefault();
     storage.removeItem('jdmCurrentUser');
     storage.setItem('jdmLoggedIn', 'false');
@@ -85,11 +84,9 @@ function showCustomAlert(message) {
     setTimeout(() => {
       window.location.href = 'index.html';
     }, 1500);
-  }
+}
 
 // ===== PURCHASE HISTORY MANAGEMENT =====
-
-// Get user's purchases
 function getUserPurchases() {
   const user = getCurrentUser();
   if (!user) return [];
@@ -98,7 +95,6 @@ function getUserPurchases() {
   return purchases[user.email] || [];
 }
 
-// Remove a purchase by ID
 function removePurchase(purchaseId) {
   const user = getCurrentUser();
   if (!user) return false;
@@ -115,7 +111,6 @@ function removePurchase(purchaseId) {
   return false;
 }
 
-// Confirm deletion
 function confirmDeletePurchase(purchaseId, carName) {
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay';
@@ -140,18 +135,15 @@ function confirmDeletePurchase(purchaseId, carName) {
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
   
-  // Add event listener to the delete button
   document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
     deletePurchase(purchaseId, this);
   });
 }
 
-// Delete purchase function
 function deletePurchase(purchaseId, button) {
   if (removePurchase(purchaseId)) {
     showSuccessAlert('Purchase removed from history!');
     button.closest('.modal-overlay').remove();
-    // Refresh the purchase history display
     if (typeof displayPurchaseHistory === 'function') {
       displayPurchaseHistory();
     }
@@ -213,7 +205,6 @@ function saveUserProfile(profileData) {
     return true;
 }
 
-// Update user greeting in navigation
 function updateUserGreeting() {
     const userGreeting = document.getElementById('userGreeting');
     if (userGreeting && isLoggedIn()) {
@@ -225,12 +216,10 @@ function updateUserGreeting() {
     }
 }
 
-// Update navigation for all pages
 function updateGlobalNavigation() {
     updateAuthNavigation();
     updateUserGreeting();
     
-    // Update cart count if cart system is loaded
     if (typeof updateCartUI === 'function') {
         updateCartUI();
     }

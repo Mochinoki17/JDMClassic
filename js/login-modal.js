@@ -1,4 +1,4 @@
-// Login modal functionality
+// Login modal functionality - JSON STORAGE VERSION
 document.addEventListener('DOMContentLoaded', function() {
     const loginModal = document.getElementById('loginModal');
     const openLogin = document.getElementById('openLogin');
@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
           storage.setItem('jdmLoggedIn', 'true');
           showSuccessAlert('Login successful! Welcome back, ' + user.fullName + '!');
           
-          // Refresh page to update UI
           setTimeout(() => window.location.reload(), 1500);
         } else {
           showCustomAlert('Invalid email or password! Please try again or sign up.');
@@ -56,20 +55,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Update navigation when login is successful
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize auth navigation
     if (typeof updateAuthNavigation === 'function') {
       updateAuthNavigation();
     }
     
-    // Also update when login happens (for modal login)
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
       const originalSubmit = loginForm.onsubmit;
       loginForm.onsubmit = function(e) {
         if (originalSubmit) originalSubmit.call(this, e);
-        // Update navigation after successful login
         setTimeout(() => {
           if (typeof updateAuthNavigation === 'function') {
             updateAuthNavigation();
@@ -79,7 +74,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Add modal close functionality
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('modal-overlay')) {
         e.target.style.display = 'none';
@@ -87,7 +81,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Add ESC key to close modal
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         const modals = document.querySelectorAll('.modal-overlay');

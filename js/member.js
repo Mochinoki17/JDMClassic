@@ -1,9 +1,8 @@
-// Member dashboard functionality
+// Member dashboard functionality - JSON STORAGE VERSION
 document.addEventListener('DOMContentLoaded', function() {
     const loginModal = document.getElementById('loginModal');
     const loginForm = document.getElementById('loginForm');
     const welcomeMessage = document.getElementById('welcomeMessage');
-    const logoutBtn = document.getElementById('logoutBtn');
     const recentPurchasesSection = document.getElementById('recentPurchases');
     const recentPurchasesContainer = document.getElementById('recentPurchasesContainer');
 
@@ -19,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 1000);
     } else {
-        // User is logged in
         if (welcomeMessage) {
             welcomeMessage.textContent = `Welcome back, ${currentUser.fullName}!`;
         }
@@ -28,11 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('modal-active');
         }
         
-        // Load recent purchases
         displayRecentPurchases();
     }
 
-    // Update auth navigation
     if (typeof updateAuthNavigation === 'function') {
         updateAuthNavigation();
     }
@@ -58,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 showSuccessAlert('Login successful! Welcome to your member dashboard.');
                 
-                // Refresh to update UI
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);
@@ -68,58 +63,57 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Display recent purchases
     function displayRecentPurchases() {
         const purchases = getUserPurchases();
         
         if (purchases.length === 0) {
-            recentPurchasesSection.style.display = 'none';
+            if (recentPurchasesSection) recentPurchasesSection.style.display = 'none';
             return;
         }
         
-        recentPurchasesSection.style.display = 'block';
+        if (recentPurchasesSection) recentPurchasesSection.style.display = 'block';
         
-        // Show only the 3 most recent purchases
         const recentPurchases = purchases
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 3);
         
-        recentPurchasesContainer.innerHTML = '';
-        
-        recentPurchases.forEach(purchase => {
-            const purchaseItem = document.createElement('div');
-            purchaseItem.className = 'history-item';
-            purchaseItem.style.cursor = 'pointer';
-            purchaseItem.onclick = () => window.location.href = 'purchase.html#purchaseHistory';
+        if (recentPurchasesContainer) {
+            recentPurchasesContainer.innerHTML = '';
             
-            const date = new Date(purchase.date).toLocaleDateString();
-            
-            purchaseItem.innerHTML = `
-                <div class="history-header">
-                    <h3>${purchase.car}</h3>
-                    <span class="history-date">${date}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <p><strong>Total: ₱${purchase.total.toLocaleString()}</strong></p>
-                        <p>Quantity: ${purchase.quantity || 1}</p>
+            recentPurchases.forEach(purchase => {
+                const purchaseItem = document.createElement('div');
+                purchaseItem.className = 'history-item';
+                purchaseItem.style.cursor = 'pointer';
+                purchaseItem.onclick = () => window.location.href = 'purchase.html#purchaseHistory';
+                
+                const date = new Date(purchase.date).toLocaleDateString();
+                
+                purchaseItem.innerHTML = `
+                    <div class="history-header">
+                        <h3>${purchase.car}</h3>
+                        <span class="history-date">${date}</span>
                     </div>
-                    <span style="color: var(--accent);">→</span>
-                </div>
-            `;
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p><strong>Total: ₱${purchase.total.toLocaleString()}</strong></p>
+                            <p>Quantity: ${purchase.quantity || 1}</p>
+                        </div>
+                        <span style="color: var(--accent);">→</span>
+                    </div>
+                `;
+                
+                recentPurchasesContainer.appendChild(purchaseItem);
+            });
             
-            recentPurchasesContainer.appendChild(purchaseItem);
-        });
-        
-        // Add view all button if there are more purchases
-        if (purchases.length > 3) {
-            const viewAllBtn = document.createElement('div');
-            viewAllBtn.style.textAlign = 'center';
-            viewAllBtn.style.marginTop = '1rem';
-            viewAllBtn.innerHTML = `
-                <a href="purchase.html#purchaseHistory" class="btn-secondary">View All Purchases</a>
-            `;
-            recentPurchasesContainer.appendChild(viewAllBtn);
+            if (purchases.length > 3) {
+                const viewAllBtn = document.createElement('div');
+                viewAllBtn.style.textAlign = 'center';
+                viewAllBtn.style.marginTop = '1rem';
+                viewAllBtn.innerHTML = `
+                    <a href="purchase.html#purchaseHistory" class="btn-secondary">View All Purchases</a>
+                `;
+                recentPurchasesContainer.appendChild(viewAllBtn);
+            }
         }
     }
 });

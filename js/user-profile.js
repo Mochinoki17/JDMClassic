@@ -1,6 +1,5 @@
-// User profile functionality
+// User profile functionality - JSON STORAGE VERSION
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if user is logged in
     if (!isLoggedIn()) {
         showCustomAlert('Please log in to access your profile.');
         setTimeout(() => {
@@ -9,16 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Initialize profile navigation
     initProfileNavigation();
-    
-    // Load profile data
     loadProfileData();
-    
-    // Setup form handlers
     setupFormHandlers();
-    
-    // Setup action buttons
     setupActionButtons();
 });
 
