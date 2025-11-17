@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase - JDM Classic Showroom</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="loginModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Welcome to JDM Classic</h2>
+        <p>Please login to continue</p>
+      </div>
+      <form class="auth-form" id="loginForm">
+        <input type="email" placeholder="Email Address" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit" class="btn-primary">Login</button>
+        <p class="auth-link">Don't have an account? <a href="signup.html" id="showSignup">Sign up here</a></p>
+      </form>
+    </div>
+  </div>
+
+  <header class="navbar">
+      <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">JDM • Classic</div>
+      <nav>
+          <a href="purchase.html">Shop</a>
+          <a href="inventory.html">Inventory</a>
+          <a href="services.html">Services</a>
+          <a href="about.html">About</a>
+      </nav>
+      <div class="nav-right">
+          <div class="nav-logos">
+              <!-- Shopping Cart -->
+              <a href="cart.html" class="nav-logo cart" title="Shopping Cart">
+                  🛒 <span class="cart-count" id="cartCount">0</span>
+              </a>
+              <!-- Contact -->
+              <a href="contact.html" class="nav-logo contact" title="Contact">📞</a>
+              <!-- Dashboard -->
+              <a href="member.html" class="nav-logo dashboard" title="Dashboard">📊</a>
+              <!-- Profile -->
+              <a href="user-profile.html" class="nav-logo profile" title="My Profile">👤</a>
+          </div>
+          <div class="account-section">
+              <div class="user-greeting" id="userGreeting" style="display: none;"></div>
+          </div>
+      </div>
+  </header>
+
+  <section class="page-header">
+    <h1>JDM Shop</h1>
+    <p>Purchase your dream JDM classic with premium aftermarket parts</p>
+  </section>
+
+<section class="featured">
+    <h2>Available Vehicles</h2>
+    <div class="car-grid">
+        <div class="car-card">
+            <div class="car-img"><img src="images/cars/skyliner32.png" alt="Skyline R32"></div>
+            <h3>Nissan Skyline GT-R R32</h3>
+            <p>₱1,250,000</p>
+            <button class="buy-btn add-to-cart-btn" 
+                    data-car="Nissan Skyline GT-R R32" 
+                    data-price="1250000" 
+                    data-image="images/cars/skyliner32.png">
+                Add to Cart
+            </button>
+        </div>
+        <div class="car-card">
+            <div class="car-img"><img src="images/cars/mazdarx7fd.jpg" alt="RX7 FD"></div>
+            <h3>Mazda RX-7 FD</h3>
+            <p>₱1,450,000</p>
+            <button class="buy-btn add-to-cart-btn" 
+                    data-car="Mazda RX-7 FD" 
+                    data-price="1450000" 
+                    data-image="images/cars/mazdarx7fd.jpg">
+                Add to Cart
+            </button>
+        </div>
+        <div class="car-card">
+            <div class="car-img"><img src="images/cars/suparmk42.jpg" alt="Supra MK4"></div>
+            <h3>Toyota Supra MK4</h3>
+            <p>₱2,300,000</p>
+            <button class="buy-btn add-to-cart-btn" 
+                    data-car="Toyota Supra MK4" 
+                    data-price="2300000" 
+                    data-image="images/cars/suparmk42.jpg">
+                Add to Cart
+            </button>
+        </div>
+        <div class="car-card">
+            <div class="car-img"><img src="images/cars/mitsubishilancer.jpg" alt="Evo IX"></div>
+            <h3>Mitsubishi Lancer Evolution IX</h3>
+            <p>₱980,000</p>
+            <button class="buy-btn add-to-cart-btn" 
+                    data-car="Mitsubishi Lancer Evolution IX" 
+                    data-price="980000" 
+                    data-image="images/cars/mitsubishilancer.jpg">
+                Add to Cart
+            </button>
+        </div>
+    </div>
+</section>
+
+  <section class="purchase-history" id="purchaseHistory" style="display: none;">
+    <h2>Your Purchase History</h2>
+    <div id="historyContainer"></div>
+  </section>
+
+  <!-- Purchase Modal -->
+  <div id="purchaseModal" class="purchase-modal">
+    <div class="purchase-content">
+      <div class="purchase-header">
+        <h2 id="purchaseCarName">Purchase Vehicle</h2>
+        <button class="close-purchase" id="closePurchase">&times;</button>
+      </div>
+      
+      <div class="purchase-details">
+        <div>
+          <img id="purchaseCarImage" src="" alt="" class="car-image-large">
+        </div>
+        <div class="car-info">
+          <h3 id="purchaseCarTitle">Vehicle Details</h3>
+          <div class="car-price" id="purchaseBasePrice">₱0</div>
+          <p>Select from our premium aftermarket parts to customize your JDM classic.</p>
+        </div>
+      </div>
+      
+      <div class="aftermarket-parts">
+        <h3>Aftermarket Parts</h3>
+        <div class="parts-grid" id="partsGrid">
+          <!-- Parts will be dynamically inserted here -->
+        </div>
+      </div>
+      
+      <div class="purchase-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-item">
+          <span>Base Vehicle:</span>
+          <span id="summaryBasePrice">₱0</span>
+        </div>
+        <div id="selectedPartsList">
+          <!-- Selected parts will be listed here -->
+        </div>
+        <div class="summary-total">
+          <span>Total:</span>
+          <span id="summaryTotalPrice">₱0</span>
+        </div>
+      </div>
+      
+      <div class="purchase-actions">
+        <button class="btn-secondary" id="cancelPurchase">Cancel</button>
+        <button class="buy-now-btn" id="confirmPurchase">Buy Now</button>
+      </div>
+    </div>
+  </div>
+
+    <!-- Cart Dropdown -->
+  <div class="cart-dropdown">
+      <div class="cart-icon" id="cartIcon">
+          🛒 <span class="cart-count" id="cartCount">0</span>
+      </div>
+      <div class="cart-content" id="cartContent">
+          <div class="cart-header">
+              <h3>Shopping Cart</h3>
+          </div>
+          <div class="cart-items" id="cartItems">
+              <!-- Cart items will be populated here -->
+          </div>
+      </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="modal-overlay">
+      <div class="modal-content" style="max-width: 600px;">
+          <div class="modal-header">
+              <h2>Checkout</h2>
+              <button class="close-modal" onclick="closeCheckoutModal()">&times;</button>
+          </div>
+          
+          <div class="checkout-summary">
+              <h3>Order Summary</h3>
+              <div class="checkout-items" id="checkoutItems">
+                  <!-- Checkout items will be populated here -->
+              </div>
+              <div class="checkout-total">
+                  <strong>Total: <span id="checkoutTotal">₱0</span></strong>
+              </div>
+          </div>
+          
+          <div class="checkout-actions">
+              <button class="btn-secondary" onclick="closeCheckoutModal()">Cancel</button>
+              <button class="btn-primary" onclick="completePurchase()">Complete Purchase</button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Parts Customization Modal -->
+  <div id="partsCustomizationModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 900px; max-height: 90vh;">
+      <div class="modal-header">
+        <h2>Customize Your JDM Classic</h2>
+        <button class="close-modal" onclick="closePartsCustomization()">&times;</button>
+      </div>
+      
+      <div class="customization-container">
+        <div class="customization-left">
+          <div class="car-preview">
+            <img id="customizationCarImage" src="" alt="" class="car-image-large">
+            <h3 id="customizationCarName">Car Name</h3>
+            <div class="base-price">Base Price: <span id="customizationBasePrice">₱0</span></div>
+          </div>
+        </div>
+        
+        <div class="customization-right">
+          <h3>Available Aftermarket Parts</h3>
+          <div class="parts-categories" id="partsCategories">
+            <!-- Categories will be populated here -->
+          </div>
+          <div class="parts-grid-customization" id="partsGridCustomization">
+            <!-- Parts will be populated here -->
+          </div>
+          
+          <div class="selected-parts-summary">
+            <h4>Selected Parts</h4>
+            <div class="selected-parts-list" id="selectedPartsList">
+              <!-- Selected parts will be listed here -->
+            </div>
+            <div class="customization-total">
+              <div class="summary-item">
+                <span>Base Vehicle:</span>
+                <span id="summaryBasePriceCustom">₱0</span>
+              </div>
+              <div class="summary-item">
+                <span>Parts Total:</span>
+                <span id="summaryPartsTotal">₱0</span>
+              </div>
+              <div class="summary-total">
+                <span>Grand Total:</span>
+                <span id="summaryGrandTotal">₱0</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="customization-actions">
+            <button type="button" class="btn-secondary" onclick="closePartsCustomization()">Cancel</button>
+            <button type="button" class="btn-primary" onclick="addCustomizedToCart()">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="social-links">
+        <a href="https://www.facebook.com/ilex.talisic.3" target="_blank">Facebook</a>
+        <a href="https://www.instagram.com/lec_uuu/" target="_blank">Instagram</a>
+        <a href="https://github.com/Mochinoki17" target="_blank">GitHub</a>
+    </div>
+    <p>© 2025 JDM Classic Showroom</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/login-modal.js"></script>
+  <script src="js/cart-system.js"></script>
+  <script src="js/utility-functions.js"></script>
+  <script src="js/github-storage.js"></script>
+
+  <script>
+      // Initialize global navigation on ALL pages
+      document.addEventListener('DOMContentLoaded', function() {
+          if (typeof updateGlobalNavigation === 'function') {
+              updateGlobalNavigation();
+          }
+          
+          // Initialize cart system to update navigation count
+          if (typeof initCartSystem === 'function') {
+              initCartSystem();
+          } else if (typeof updateNavigationCartCount === 'function') {
+              // If initCartSystem doesn't exist, just update the count
+              updateNavigationCartCount();
+          }
+      });
+  </script>
+</body>
+</html>

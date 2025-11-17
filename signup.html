@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - JDM Classic Showroom</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <header class="navbar">
+      <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">JDM • Classic</div>
+      <nav>
+          <a href="purchase.html">Shop</a>
+          <a href="inventory.html">Inventory</a>
+          <a href="services.html">Services</a>
+          <a href="about.html">About</a>
+      </nav>
+      <div class="nav-right">
+          <div class="nav-logos">
+              <!-- Shopping Cart -->
+              <a href="cart.html" class="nav-logo cart" title="Shopping Cart">
+                  🛒 <span class="cart-count" id="cartCount">0</span>
+              </a>
+              <!-- Contact -->
+              <a href="contact.html" class="nav-logo contact" title="Contact">📞</a>
+              <!-- Dashboard -->
+              <a href="member.html" class="nav-logo dashboard" title="Dashboard">📊</a>
+              <!-- Profile -->
+              <a href="user-profile.html" class="nav-logo profile" title="My Profile">👤</a>
+          </div>
+          <div class="account-section">
+              <div class="user-greeting" id="userGreeting" style="display: none;"></div>
+          </div>
+      </div>
+  </header>
+
+  <section class="page-header">
+    <h1>Create Account</h1>
+    <p>Join the JDM Classic community</p>
+  </section>
+
+  <section class="content">
+    <div class="modal-overlay" style="display: flex; position: relative; background: transparent; backdrop-filter: none;">
+      <div class="modal-content" style="margin: 0 auto; position: relative; top: 0; transform: none; animation: none;">
+        <div class="modal-header">
+          <h2>Join JDM Classic</h2>
+          <p>Create your account to continue</p>
+        </div>
+        <form class="auth-form" id="signupForm">
+          <input type="text" id="fullName" placeholder="Full Name" required>
+          <input type="email" id="email" placeholder="Email Address" required>
+          <input type="password" id="password" placeholder="Password" required minlength="6">
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+          <button type="submit" class="btn-primary">Create Account</button>
+          <p class="auth-link">Already have an account? <a href="login.html">Login here</a></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="social-links">
+        <a href="https://www.facebook.com/ilex.talisic.3" target="_blank">Facebook</a>
+        <a href="https://www.instagram.com/lec_uuu/" target="_blank">Instagram</a>
+        <a href="https://github.com/Mochinoki17" target="_blank">GitHub</a>
+    </div>
+    <p>© 2025 JDM Classic Showroom</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/login-modal.js"></script>
+  <script src="js/cart-system.js"></script>
+  <script src="js/github-storage.js"></script>
+
+  <script>
+      // Initialize global navigation on ALL pages
+      document.addEventListener('DOMContentLoaded', function() {
+          if (typeof updateGlobalNavigation === 'function') {
+              updateGlobalNavigation();
+          }
+          
+          // Initialize cart system to update navigation count
+          if (typeof initCartSystem === 'function') {
+              initCartSystem();
+          } else if (typeof updateNavigationCartCount === 'function') {
+              // If initCartSystem doesn't exist, just update the count
+              updateNavigationCartCount();
+          }
+      });
+  </script>
+</body>
+</html>

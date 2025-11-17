@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - JDM Classic Showroom</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="loginModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Welcome to JDM Classic</h2>
+        <p>Please login to continue</p>
+      </div>
+      <form class="auth-form" id="loginForm">
+        <input type="email" placeholder="Email Address" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit" class="btn-primary">Login</button>
+        <p class="auth-link">Don't have an account? <a href="signup.html" id="showSignup">Sign up here</a></p>
+      </form>
+    </div>
+  </div>
+
+    <header class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">JDM • Classic</div>
+        <nav>
+            <a href="purchase.html">Shop</a>
+            <a href="inventory.html">Inventory</a>
+            <a href="services.html">Services</a>
+            <a href="about.html">About</a>
+        </nav>
+        <div class="nav-right">
+            <div class="nav-logos">
+                <!-- Shopping Cart -->
+                <a href="cart.html" class="nav-logo cart" title="Shopping Cart">
+                    🛒 <span class="cart-count" id="cartCount">0</span>
+                </a>
+                <!-- Contact -->
+                <a href="contact.html" class="nav-logo contact" title="Contact">📞</a>
+                <!-- Dashboard -->
+                <a href="member.html" class="nav-logo dashboard" title="Dashboard">📊</a>
+                <!-- Profile -->
+                <a href="user-profile.html" class="nav-logo profile" title="My Profile">👤</a>
+            </div>
+            <div class="account-section">
+                <div class="user-greeting" id="userGreeting" style="display: none;"></div>
+            </div>
+        </div>
+    </header>
+
+  <section class="page-header">
+    <h1>My Profile</h1>
+    <p id="profileWelcome">Manage your account settings and preferences</p>
+  </section>
+
+  <section class="content">
+    <div class="profile-container">
+      <div class="profile-sidebar">
+        <div class="profile-avatar">
+          <div class="avatar-placeholder" id="userAvatar">JD</div>
+          <h3 id="userName">John Doe</h3>
+          <p id="userEmail">john@example.com</p>
+        </div>
+        <nav class="profile-nav">
+          <a href="#personal" class="profile-nav-link active">Personal Info</a>
+          <a href="#preferences" class="profile-nav-link">Preferences</a>
+          <a href="#security" class="profile-nav-link">Security</a>
+          <a href="#notifications" class="profile-nav-link">Notifications</a>
+        </nav>
+      </div>
+
+      <div class="profile-content">
+        <!-- Personal Information Section -->
+        <div id="personal" class="profile-section active">
+          <h2>Personal Information</h2>
+          <form class="profile-form" id="personalInfoForm">
+            <div class="form-group">
+              <label for="profileFullName">Full Name</label>
+              <input type="text" id="profileFullName" placeholder="Enter your full name" required>
+            </div>
+            <div class="form-group">
+              <label for="profileEmail">Email Address</label>
+              <input type="email" id="profileEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+              <label for="profilePhone">Phone Number</label>
+              <input type="tel" id="profilePhone" placeholder="Enter your phone number">
+            </div>
+            <div class="form-group">
+              <label for="profileAddress">Address</label>
+              <textarea id="profileAddress" placeholder="Enter your address" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn-primary">Save Changes</button>
+          </form>
+        </div>
+
+        <!-- Preferences Section -->
+        <div id="preferences" class="profile-section">
+          <h2>Preferences</h2>
+          <form class="profile-form" id="preferencesForm">
+            <div class="form-group">
+              <label>Favorite JDM Brands</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="brands" value="nissan"> Nissan
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="brands" value="toyota"> Toyota
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="brands" value="mazda"> Mazda
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="brands" value="mitsubishi"> Mitsubishi
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="brands" value="honda"> Honda
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="brands" value="subaru"> Subaru
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="newsletter">Email Newsletter</label>
+              <select id="newsletter" class="form-select">
+                <option value="weekly">Weekly Updates</option>
+                <option value="monthly">Monthly Digest</option>
+                <option value="none">No Newsletter</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="eventNotifications"> Receive event notifications
+              </label>
+            </div>
+            <button type="submit" class="btn-primary">Save Preferences</button>
+          </form>
+        </div>
+
+        <!-- Security Section -->
+        <div id="security" class="profile-section">
+          <h2>Security Settings</h2>
+          <form class="profile-form" id="securityForm">
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <input type="password" id="currentPassword" placeholder="Enter current password">
+            </div>
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <input type="password" id="newPassword" placeholder="Enter new password" minlength="6">
+            </div>
+            <div class="form-group">
+              <label for="confirmNewPassword">Confirm New Password</label>
+              <input type="password" id="confirmNewPassword" placeholder="Confirm new password">
+            </div>
+            <button type="submit" class="btn-primary">Update Password</button>
+          </form>
+        </div>
+
+        <!-- Notifications Section -->
+        <div id="notifications" class="profile-section">
+          <h2>Notification Settings</h2>
+          <form class="profile-form" id="notificationsForm">
+            <div class="form-group">
+              <h3>Email Notifications</h3>
+              <label class="checkbox-label">
+                <input type="checkbox" name="emailNotifications" value="purchase" checked> Purchase confirmations
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="emailNotifications" value="shipping" checked> Shipping updates
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="emailNotifications" value="promotions"> Special promotions
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="emailNotifications" value="events"> JDM events and meets
+              </label>
+            </div>
+            <div class="form-group">
+              <h3>Push Notifications</h3>
+              <label class="checkbox-label">
+                <input type="checkbox" name="pushNotifications" value="new_cars"> New car arrivals
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="pushNotifications" value="price_drops"> Price drops
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="pushNotifications" value="maintenance"> Maintenance reminders
+              </label>
+            </div>
+            <button type="submit" class="btn-primary">Save Notification Settings</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  <div class="profile-actions" style="margin-top: 3rem; text-align: center;">
+    <button class="btn-secondary" id="exportData" style="margin-right: 1rem;">
+      Export My Data
+    </button>
+    <button class="btn-secondary" id="logoutBtn" style="background: rgba(255, 59, 59, 0.2); border-color: rgba(255, 59, 59, 0.4); margin-right: 1rem;">
+      Logout
+    </button>
+    <button class="btn-secondary" id="deleteAccount" style="background: rgba(255, 59, 59, 0.2); border-color: rgba(255, 59, 59, 0.4);">
+      Delete Account
+    </button>
+  </div>
+
+  <footer>
+    <div class="social-links">
+        <a href="https://www.facebook.com/ilex.talisic.3" target="_blank">Facebook</a>
+        <a href="https://www.instagram.com/lec_uuu/" target="_blank">Instagram</a>
+        <a href="https://github.com/Mochinoki17" target="_blank">GitHub</a>
+    </div>
+    <p>© 2025 JDM Classic Showroom</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/login-modal.js"></script>
+  <script src="js/cart-system.js"></script>
+  <script src="js/user-profile.js"></script>
+  <script src="js/github-storage.js"></script>
+
+  <script>
+      // Initialize global navigation on ALL pages
+      document.addEventListener('DOMContentLoaded', function() {
+          if (typeof updateGlobalNavigation === 'function') {
+              updateGlobalNavigation();
+          }
+          
+          // Initialize cart system to update navigation count
+          if (typeof initCartSystem === 'function') {
+              initCartSystem();
+          } else if (typeof updateNavigationCartCount === 'function') {
+              // If initCartSystem doesn't exist, just update the count
+              updateNavigationCartCount();
+          }
+      });
+  </script>
+
+  <script src="js/utility-functions.js"></script>
+</body>
+</html>

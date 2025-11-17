@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart - JDM Classic Showroom</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="loginModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Welcome to JDM Classic</h2>
+        <p>Please login to continue</p>
+      </div>
+      <form class="auth-form" id="loginForm">
+        <input type="email" placeholder="Email Address" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit" class="btn-primary">Login</button>
+        <p class="auth-link">Don't have an account? <a href="signup.html" id="showSignup">Sign up here</a></p>
+      </form>
+    </div>
+  </div>
+
+    <header class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">JDM • Classic</div>
+        <nav>
+            <a href="purchase.html">Shop</a>
+            <a href="inventory.html">Inventory</a>
+            <a href="services.html">Services</a>
+            <a href="about.html">About</a>
+        </nav>
+        <div class="nav-right">
+            <div class="nav-logos">
+                <!-- Shopping Cart -->
+                <a href="cart.html" class="nav-logo cart" title="Shopping Cart">
+                    🛒 <span class="cart-count" id="cartCount">0</span>
+                </a>
+                <!-- Contact -->
+                <a href="contact.html" class="nav-logo contact" title="Contact">📞</a>
+                <!-- Dashboard -->
+                <a href="member.html" class="nav-logo dashboard" title="Dashboard">📊</a>
+                <!-- Profile -->
+                <a href="user-profile.html" class="nav-logo profile" title="My Profile">👤</a>
+            </div>
+            <div class="account-section">
+                <div class="user-greeting" id="userGreeting" style="display: none;"></div>
+            </div>
+        </div>
+    </header>
+
+  <section class="page-header">
+    <h1>Shopping Cart</h1>
+    <p>Review your selected JDM classics</p>
+  </section>
+
+  <section class="content">
+    <div class="cart-container" id="cartContainer">
+      <!-- Empty cart state -->
+      <div class="empty-cart" id="emptyCart">
+        <h3>Your cart is empty</h3>
+        <p>Browse our shop to add some JDM classics to your cart!</p>
+        <a href="purchase.html" class="btn-primary">Go to Shop</a>
+      </div>
+
+      <!-- Cart with items -->
+      <div class="cart-items" id="cartItemsContainer" style="display: none;">
+        <h3>Your Selected Items</h3>
+        <div id="cartItemsList">
+          <!-- Cart items will be populated here by JavaScript -->
+        </div>
+      </div>
+
+      <div class="cart-summary" id="cartSummary" style="display: none;">
+        <h3>Order Summary</h3>
+        <div class="summary-details">
+          <div class="summary-item">
+            <span>Subtotal:</span>
+            <span id="summarySubtotal">₱0</span>
+          </div>
+          <div class="summary-item">
+            <span>Shipping:</span>
+            <span id="summaryShipping">₱0</span>
+          </div>
+          <div class="summary-item">
+            <span>Tax:</span>
+            <span id="summaryTax">₱0</span>
+          </div>
+          <div class="summary-total">
+            <span>Total:</span>
+            <span id="summaryTotal">₱0</span>
+          </div>
+        </div>
+        <button class="btn-primary checkout-btn" id="checkoutBtn" style="width: 100%; margin-top: 1rem;">Proceed to Checkout</button>
+      </div>
+    </div>
+
+    <!-- Checkout Form Modal -->
+    <div id="checkoutModal" class="modal-overlay">
+      <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+          <h2>Complete Your Purchase</h2>
+          <button class="close-modal" onclick="closeCheckoutModal()">&times;</button>
+        </div>
+        
+        <form class="checkout-form" id="checkoutForm">
+          <div class="checkout-columns">
+            <div class="checkout-left">
+              <h3>Shipping Information</h3>
+              <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" required>
+              </div>
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required>
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" required>
+              </div>
+              <div class="form-group">
+                <label for="address">Shipping Address</label>
+                <textarea id="address" rows="3" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" required>
+              </div>
+              <div class="form-group">
+                <label for="zipCode">ZIP Code</label>
+                <input type="text" id="zipCode" required>
+              </div>
+            </div>
+            
+            <div class="checkout-right">
+              <h3>Order Summary</h3>
+              <div class="checkout-items" id="checkoutItems">
+                <!-- Checkout items will be populated here -->
+              </div>
+              <div class="checkout-total">
+                <strong>Total: <span id="checkoutTotal">₱0</span></strong>
+              </div>
+              
+              <h3 style="margin-top: 2rem;">Payment Method</h3>
+              <div class="payment-methods">
+                <label class="payment-option">
+                  <input type="radio" name="payment" value="bank" checked>
+                  <span>Bank Transfer</span>
+                </label>
+                <label class="payment-option">
+                  <input type="radio" name="payment" value="credit">
+                  <span>Credit Card</span>
+                </label>
+                <label class="payment-option">
+                  <input type="radio" name="payment" value="cash">
+                  <span>Cash on Delivery</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="checkout-actions">
+            <button type="button" class="btn-secondary" onclick="closeCheckoutModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Complete Purchase</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Parts Customization Modal -->
+<div id="partsCustomizationModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content" style="max-width: 900px; max-height: 90vh;">
+    <div class="modal-header">
+      <h2>Customize Your JDM Classic</h2>
+      <button class="close-modal" onclick="closePartsCustomization()">&times;</button>
+    </div>
+    
+    <div class="customization-container">
+      <div class="customization-left">
+        <div class="car-preview">
+          <img id="customizationCarImage" src="" alt="" class="car-image-large">
+          <h3 id="customizationCarName">Car Name</h3>
+          <div class="base-price">Base Price: <span id="customizationBasePrice">₱0</span></div>
+        </div>
+      </div>
+      
+      <div class="customization-right">
+        <h3>Available Aftermarket Parts</h3>
+        <div class="parts-categories" id="partsCategories">
+          <!-- Categories will be populated here -->
+        </div>
+        <div class="parts-grid-customization" id="partsGridCustomization">
+          <!-- Parts will be populated here -->
+        </div>
+        
+        <div class="selected-parts-summary">
+          <h4>Selected Parts</h4>
+          <div class="selected-parts-list" id="selectedPartsList">
+            <!-- Selected parts will be listed here -->
+          </div>
+          <div class="customization-total">
+            <div class="summary-item">
+              <span>Base Vehicle:</span>
+              <span id="summaryBasePriceCustom">₱0</span>
+            </div>
+            <div class="summary-item">
+              <span>Parts Total:</span>
+              <span id="summaryPartsTotal">₱0</span>
+            </div>
+            <div class="summary-total">
+              <span>Grand Total:</span>
+              <span id="summaryGrandTotal">₱0</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="customization-actions">
+          <button type="button" class="btn-secondary" onclick="closePartsCustomization()">Cancel</button>
+          <button type="button" class="btn-primary" onclick="addCustomizedToCart()">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <footer>
+    <div class="social-links">
+        <a href="https://www.facebook.com/ilex.talisic.3" target="_blank">Facebook</a>
+        <a href="https://www.instagram.com/lec_uuu/" target="_blank">Instagram</a>
+        <a href="https://github.com/Mochinoki17" target="_blank">GitHub</a>
+    </div>
+    <p>© 2025 JDM Classic Showroom</p>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/login-modal.js"></script>
+  <script src="js/cart-system.js"></script>
+  <script src="utility-functions.js"></script>
+  <script src="js/github-storage.js"></script>
+
+  <script>
+      // Initialize global navigation on ALL pages
+      document.addEventListener('DOMContentLoaded', function() {
+          console.log('Cart page loaded, initializing systems...');
+          
+          if (typeof updateGlobalNavigation === 'function') {
+              updateGlobalNavigation();
+          }
+          
+          // Initialize cart system ONLY ONCE
+          if (typeof initCartSystem === 'function') {
+              // Small delay to ensure DOM is fully ready
+              setTimeout(() => {
+                  initCartSystem();
+              }, 100);
+          }
+      });
+  </script>
+  
+</body>
+</html>
