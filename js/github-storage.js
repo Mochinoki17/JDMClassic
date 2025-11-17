@@ -1,6 +1,7 @@
-// github-storage.js - Enhanced storage for GitHub Pages
+// github-storage.js
 class GitHubPagesStorage {
     constructor() {
+        console.log('GitHubPagesStorage initialized');
         this.storageLayers = [
             this.tryLocalStorage.bind(this),
             this.trySessionStorage.bind(this),
@@ -9,7 +10,8 @@ class GitHubPagesStorage {
         ];
         
         this.domainKey = this.getDomainKey();
-        this.loadURLData(); // Load any cart data from URL
+        console.log('Domain key:', this.domainKey);
+        this.loadURLData();
     }
     
     getDomainKey() {
@@ -103,30 +105,40 @@ class GitHubPagesStorage {
     }
     
     setItem(key, value) {
-        console.log(`Storage: Setting ${key}`, value);
+        console.log(`🔧 STORAGE DEBUG: Setting ${key}`, value);
         
+        let saved = false;
         // Try all storage layers
         for (const layer of this.storageLayers) {
             if (layer(key, value)) {
-                console.log(`Storage: ${key} saved via ${layer.name}`);
+                console.log(`✅ STORAGE: ${key} saved via ${layer.name}`);
+                saved = true;
                 break;
             }
+        }
+        
+        if (!saved) {
+            console.error(`❌ STORAGE: Failed to save ${key} to any storage layer`);
         }
     }
     
     getItem(key) {
+        console.log(`🔧 STORAGE DEBUG: Getting ${key}`);
+        
         // Try layers in reverse order (URL -> Window -> Session -> Local)
         for (let i = this.storageLayers.length - 1; i >= 0; i--) {
             try {
                 const value = this.getFromLayer(this.storageLayers[i], key);
                 if (value !== null && value !== undefined) {
-                    console.log(`Storage: ${key} loaded from ${this.storageLayers[i].name}`);
+                    console.log(`✅ STORAGE: ${key} loaded from ${this.storageLayers[i].name}`, value);
                     return value;
                 }
             } catch (e) {
-                // Continue to next layer
+                console.warn(`STORAGE: Error getting ${key} from ${this.storageLayers[i].name}:`, e);
             }
         }
+        
+        console.log(`❌ STORAGE: ${key} not found in any storage layer`);
         return null;
     }
     
