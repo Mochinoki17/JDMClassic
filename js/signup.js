@@ -1,35 +1,35 @@
-// Signup page functionality
+// Signup page functionality - TESTED VERSION
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Signup page loaded - checking storage system...');
+    console.log('🔐 Signup page loaded');
     
     const signupForm = document.getElementById('signupForm');
     
-    // Test storage system
-    console.log('Storage system test:', typeof storage);
-    console.log('Storage setItem test:', typeof storage.setItem);
+    // Test storage immediately
+    console.log('🧪 Storage test:', typeof storage !== 'undefined' ? 'OK' : 'MISSING');
     
     if (signupForm) {
-        console.log('Signup form found, adding event listener');
+        console.log('✅ Signup form found');
         
         signupForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            console.log('Signup form submitted');
+            console.log('📝 Signup form submitted');
             
             const fullName = document.getElementById('fullName').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             
-            console.log('Form data:', { fullName, email, password, confirmPassword });
+            console.log('📋 Form data captured');
             
+            // Validation
             if (password !== confirmPassword) {
-                console.log('Password mismatch error');
+                console.log('❌ Password mismatch');
                 showCustomAlert('Passwords do not match!');
                 return;
             }
             
             if (password.length < 6) {
-                console.log('Password too short error');
+                console.log('❌ Password too short');
                 showCustomAlert('Password must be at least 6 characters long!');
                 return;
             }
@@ -41,88 +41,86 @@ document.addEventListener('DOMContentLoaded', function() {
                 createdAt: new Date().toISOString()
             };
             
-            console.log('User data to save:', userData);
+            console.log('👤 User data prepared:', userData);
             
             // Get existing users
             const existingUsers = storage.getItem('jdmUsers') || [];
-            console.log('Existing users:', existingUsers);
+            console.log('📊 Existing users:', existingUsers.length);
             
+            // Check if user exists
             const userExists = existingUsers.find(user => user.email === email);
-            
             if (userExists) {
-                console.log('User already exists error');
+                console.log('❌ User already exists');
                 showCustomAlert('An account with this email already exists!');
                 return;
             }
             
             // Add new user
             existingUsers.push(userData);
-            console.log('Updated users list:', existingUsers);
+            console.log('📈 Updated users list:', existingUsers.length, 'users');
             
-            // Save to storage with error handling
             try {
-                console.log('Saving users to storage...');
+                // Save everything
+                console.log('💾 Saving users list...');
                 storage.setItem('jdmUsers', existingUsers);
-                console.log('Users saved successfully');
                 
-                console.log('Setting current user...');
+                console.log('💾 Setting current user...');
                 storage.setItem('jdmCurrentUser', userData);
-                console.log('Current user set');
                 
-                console.log('Setting login status...');
+                console.log('💾 Setting login status...');
                 storage.setItem('jdmLoggedIn', 'true');
-                console.log('Login status set');
                 
-                // Verify the data was saved
-                const verifyUsers = storage.getItem('jdmUsers');
-                const verifyCurrent = storage.getItem('jdmCurrentUser');
-                const verifyLogin = storage.getItem('jdmLoggedIn');
-                
-                console.log('Verification - Users:', verifyUsers);
-                console.log('Verification - Current User:', verifyCurrent);
-                console.log('Verification - Login Status:', verifyLogin);
-                
-                if (verifyCurrent && verifyCurrent.email === email) {
-                    console.log('Signup successful!');
-                    showSuccessAlert('Account created successfully! Welcome to JDM Classic.');
+                // Verify saves
+                setTimeout(() => {
+                    const verifyUsers = storage.getItem('jdmUsers');
+                    const verifyCurrent = storage.getItem('jdmCurrentUser');
+                    const verifyLogin = storage.getItem('jdmLoggedIn');
                     
-                    // Redirect after successful signup
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 2000);
-                } else {
-                    console.log('Signup verification failed');
-                    showCustomAlert('Account created but there was an issue. Please try logging in.');
-                }
+                    console.log('🔍 Verification:');
+                    console.log(' - Users:', verifyUsers ? verifyUsers.length + ' users' : 'MISSING');
+                    console.log(' - Current User:', verifyCurrent ? verifyCurrent.email : 'MISSING');
+                    console.log(' - Login Status:', verifyLogin);
+                    
+                    if (verifyCurrent && verifyCurrent.email === email) {
+                        console.log('✅ Signup SUCCESSFUL!');
+                        showSuccessAlert('Account created successfully! Welcome to JDM Classic.');
+                        
+                        // Redirect to homepage
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 2000);
+                    } else {
+                        console.log('❌ Signup verification failed');
+                        showCustomAlert('Account created but verification failed. Please try logging in.');
+                    }
+                }, 100);
                 
             } catch (error) {
-                console.error('Storage error during signup:', error);
+                console.error('💥 Storage error:', error);
                 showCustomAlert('Error creating account. Please try again.');
             }
         });
     } else {
-        console.error('Signup form not found!');
+        console.error('❌ Signup form not found!');
     }
     
-    // Redirect if already logged in
-    const isLoggedIn = storage.getItem('jdmLoggedIn') === 'true';
+    // Check if already logged in
     const currentUser = storage.getItem('jdmCurrentUser');
+    const isLoggedIn = storage.getItem('jdmLoggedIn') === 'true';
     
-    console.log('Login check - Logged in:', isLoggedIn, 'Current user:', currentUser);
+    console.log('🔐 Login status check:', { isLoggedIn, currentUser: currentUser ? currentUser.email : 'None' });
     
     if (isLoggedIn && currentUser) {
-        console.log('User already logged in, redirecting...');
+        console.log('🔄 Already logged in, redirecting...');
         showSuccessAlert('You are already logged in! Redirecting to homepage...');
         setTimeout(() => {
             window.location.href = 'index.html';
         }, 2000);
     }
-
-    // Update navigation after login/signup
-    if (typeof updateAuthNavigation === 'function') {
-        console.log('Updating auth navigation...');
-        updateAuthNavigation();
-    } else {
-        console.warn('updateAuthNavigation function not found');
+    
+    // Debug storage
+    console.log('🐛 Storage debug:');
+    if (typeof storage.debugStorage === 'function') {
+        storage.debugStorage();
     }
 });
