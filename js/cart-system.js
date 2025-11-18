@@ -34,14 +34,102 @@ const aftermarketParts = {
     ]
 };
 
-// Initialize cart system - JSON STORAGE VERSION
+// JSON Storage Functions
+function saveCartToJSON() {
+    try {
+        const cartData = {
+            timestamp: new Date().toISOString(),
+            items: cart,
+            version: '1.0'
+        };
+        
+        // In a real implementation, you would send this to your server
+        // For now, we'll simulate by storing in localStorage with JSON format
+        localStorage.setItem('jdmCart', JSON.stringify(cartData));
+        console.log('Cart saved to JSON storage:', cartData);
+        
+        // Simulate server sync (in a real app, you'd use fetch/axios)
+        simulateServerSync(cartData);
+        
+    } catch (error) {
+        console.error('Error saving cart to JSON:', error);
+    }
+}
+
+function loadCartFromJSON() {
+    try {
+        const savedCart = localStorage.getItem('jdmCart');
+        if (savedCart) {
+            const cartData = JSON.parse(savedCart);
+            
+            // Validate the JSON structure
+            if (cartData && cartData.items && Array.isArray(cartData.items)) {
+                // Remove duplicates when loading
+                const uniqueCart = [];
+                const seenItems = new Set();
+                
+                cartData.items.forEach(item => {
+                    const itemKey = `${item.car}-${item.price}-${item.id}`;
+                    if (!seenItems.has(itemKey)) {
+                        seenItems.add(itemKey);
+                        uniqueCart.push(item);
+                    }
+                });
+                
+                cart = uniqueCart;
+                console.log('Cart loaded from JSON storage:', cart);
+            } else {
+                console.warn('Invalid cart data structure, initializing empty cart');
+                cart = [];
+            }
+        } else {
+            cart = [];
+            console.log('No cart found in JSON storage, initializing empty cart');
+        }
+    } catch (error) {
+        console.error('Error loading cart from JSON:', error);
+        cart = [];
+    }
+}
+
+function simulateServerSync(cartData) {
+    // In a real implementation, this would be an API call to your server
+    console.log('Simulating server sync with cart data:', cartData);
+    
+    // You would typically do something like:
+    /*
+    fetch('/api/cart/sync', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cartData)
+    })
+    .then(response => response.json())
+    .then(data => console.log('Server sync successful:', data))
+    .catch(error => console.error('Server sync failed:', error));
+    */
+}
+
+// Save cart wrapper function
+function saveCart() {
+    saveCartToJSON();
+}
+
+// Load cart wrapper function  
+function loadCart() {
+    loadCartFromJSON();
+}
+
+// Initialize cart system - JSON VERSION
 function initCartSystem() {
+    // Prevent multiple initializations
     if (cartInitialized) {
         console.log('Cart system already initialized, skipping...');
         return;
     }
     
-    console.log('🛒 Initializing cart system - JSON STORAGE');
+    console.log('Initializing JSON cart system...');
     cartInitialized = true;
 
     ensurePartsModalExists();
@@ -49,7 +137,7 @@ function initCartSystem() {
     loadCart();
     updateCartUI();
     
-    // Add event listeners to Add to Cart buttons
+    // Add event listeners to Add to Cart buttons - WITH DELEGATION
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('add-to-cart-btn') || 
             e.target.closest('.add-to-cart-btn')) {
@@ -81,6 +169,7 @@ function initCartSystem() {
     const checkoutBtn = document.getElementById('checkoutBtn');
     if (checkoutBtn) {
         console.log('Checkout button found, adding listener');
+        // Remove any existing listeners first
         checkoutBtn.replaceWith(checkoutBtn.cloneNode(true));
         document.getElementById('checkoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
@@ -106,33 +195,21 @@ function initCartSystem() {
     // Load purchase history
     loadPurchaseHistory();
     
-    console.log('Cart system initialized. Cart items:', cart.length);
-}
-
-// Update navigation with user info
-function updateNavigationUserInfo() {
-    const userGreeting = document.getElementById('userGreeting');
-    if (userGreeting && isLoggedIn()) {
-        const user = getCurrentUser();
-        userGreeting.textContent = `Hello, ${user.fullName.split(' ')[0]}`;
-        userGreeting.style.display = 'block';
-    } else if (userGreeting) {
-        userGreeting.style.display = 'none';
-    }
+    console.log('JSON Cart system initialized. Cart items:', cart.length);
 }
 
 // Add item to cart
 function addToCart(car, price, image) {
     console.log('addToCart called with:', car, price, image);
     
-    const existingItem = cart.find(item => item.car === car);
+    const existingItem = cart.find(item => item.car === car && item.price === price);
     
     if (existingItem) {
         existingItem.quantity += 1;
         console.log('Increased quantity for existing item');
     } else {
         const newItem = {
-            id: Date.now() + Math.random(),
+            id: Date.now() + Math.random(), // More unique ID
             car: car,
             price: price,
             image: image,
@@ -153,6 +230,7 @@ function removeFromCart(itemId) {
     console.log('removeFromCart called with ID:', itemId);
     console.log('Cart before removal:', cart);
     
+    // Convert itemId to number for comparison
     itemId = Number(itemId);
     
     cart = cart.filter(item => item.id !== itemId);
@@ -169,6 +247,7 @@ function removeFromCart(itemId) {
 function updateQuantity(itemId, change) {
     console.log('updateQuantity called with ID:', itemId, 'change:', change);
     
+    // Convert itemId to number for comparison
     itemId = Number(itemId);
     
     const item = cart.find(item => item.id === itemId);
@@ -223,6 +302,7 @@ function updateCartUI() {
             cartSummary.style.display = 'block';
             cartContainer.classList.remove('empty-cart-layout');
             
+            // Clear the container FIRST to prevent duplication
             if (cartItemsList) {
                 cartItemsList.innerHTML = '';
             } else {
@@ -303,56 +383,6 @@ function updateCartSummary() {
     }
     if (document.getElementById('summaryTotal')) {
         document.getElementById('summaryTotal').textContent = `₱${total.toLocaleString()}`;
-    }
-}
-
-// Save cart to JSON storage - UPDATED
-function saveCart() {
-    try {
-        const uniqueCart = [];
-        const seenItems = new Set();
-        
-        cart.forEach(item => {
-            const itemKey = `${item.car}-${item.price}`;
-            if (!seenItems.has(itemKey)) {
-                seenItems.add(itemKey);
-                uniqueCart.push(item);
-            }
-        });
-        
-        cart = uniqueCart;
-        storage.setItem('jdmCart', cart);
-        console.log('💾 Cart saved to JSON storage:', cart);
-    } catch (error) {
-        console.error('Error saving cart:', error);
-    }
-}
-
-// Load cart from JSON storage - UPDATED
-function loadCart() {
-    try {
-        const savedCart = storage.getItem('jdmCart');
-        if (savedCart) {
-            const uniqueCart = [];
-            const seenItems = new Set();
-            
-            savedCart.forEach(item => {
-                const itemKey = `${item.car}-${item.price}`;
-                if (!seenItems.has(itemKey)) {
-                    seenItems.add(itemKey);
-                    uniqueCart.push(item);
-                }
-            });
-            
-            cart = uniqueCart;
-            console.log('📥 Cart loaded from JSON storage:', cart);
-        } else {
-            cart = [];
-            console.log('No cart found in JSON storage, initializing empty cart');
-        }
-    } catch (error) {
-        console.error('Error loading cart:', error);
-        cart = [];
     }
 }
 
@@ -469,87 +499,107 @@ function updateCheckoutSummary() {
     checkoutTotal.textContent = `₱${grandTotal.toLocaleString()}`;
 }
 
-// Complete purchase - UPDATED FOR JSON STORAGE
-function completePurchase(e) {
-    if (e) e.preventDefault();
-    
-    console.log('completePurchase called - JSON STORAGE');
-    
-    if (!isLoggedIn()) {
-        showCustomAlert('Please log in to complete your purchase.');
-        closeCheckoutModal();
-        return false;
-    }
-    
-    if (cart.length === 0) {
-        showCustomAlert('Your cart is empty!');
-        return false;
-    }
-    
-    // Validate form
-    const fullName = document.getElementById('fullName').value;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const address = document.getElementById('address').value;
-    const city = document.getElementById('city').value;
-    const zipCode = document.getElementById('zipCode').value;
-    
-    if (!fullName || !email || !phone || !address || !city || !zipCode) {
-        showCustomAlert('Please fill out all required shipping information.');
-        return false;
-    }
-    
-    const user = getCurrentUser();
-    const purchases = storage.getItem('jdmPurchases') || {};
-    
-    if (!purchases[user.email]) {
-        purchases[user.email] = [];
-    }
-    
-    // Create purchase records for each cart item
-    cart.forEach(item => {
-        const purchase = {
-            id: Date.now() + Math.random(),
-            car: item.car,
-            basePrice: item.basePrice || item.price,
-            quantity: item.quantity,
-            total: item.price * item.quantity,
-            date: new Date().toISOString(),
-            parts: item.parts || [],
-            shippingInfo: {
-                name: fullName,
-                email: email,
-                phone: phone,
-                address: address,
-                city: city,
-                zipCode: zipCode
-            },
-            paymentMethod: document.querySelector('input[name="payment"]:checked')?.value || 'credit_card'
-        };
-        purchases[user.email].push(purchase);
-    });
-    
-    // Save to JSON storage - UPDATED
-    storage.setItem('jdmPurchases', purchases);
-    
-    // Clear cart
-    cart = [];
-    saveCart();
-    updateCartUI();
-    
-    showSuccessAlert('Purchase completed successfully! You will receive a confirmation email shortly.');
-    closeCheckoutModal();
-    
-    // Reload purchase history if we're on a page that shows it
-    loadPurchaseHistory();
-    
-    // Redirect to member page
-    setTimeout(() => {
-        window.location.href = 'member.html';
-    }, 2000);
-    
-    return false;
-}
+   // Complete purchase
+   function completePurchase(e) {
+       if (e) e.preventDefault();
+       
+       console.log('completePurchase called');
+       
+       if (!isLoggedIn()) {
+           showCustomAlert('Please log in to complete your purchase.');
+           closeCheckoutModal();
+           return false;
+       }
+       
+       if (cart.length === 0) {
+           showCustomAlert('Your cart is empty!');
+           return false;
+       }
+       
+       // Validate form
+       const fullName = document.getElementById('fullName').value;
+       const email = document.getElementById('email').value;
+       const phone = document.getElementById('phone').value;
+       const address = document.getElementById('address').value;
+       const city = document.getElementById('city').value;
+       const zipCode = document.getElementById('zipCode').value;
+       
+       if (!fullName || !email || !phone || !address || !city || !zipCode) {
+           showCustomAlert('Please fill out all required shipping information.');
+           return false;
+       }
+       
+       const user = getCurrentUser();
+       
+       // Load existing purchases from localStorage
+       let purchases = {};
+       try {
+           const savedPurchases = localStorage.getItem('jdmPurchases');
+           if (savedPurchases) {
+               purchases = JSON.parse(savedPurchases);
+           }
+       } catch (error) {
+           console.error('Error loading purchases:', error);
+           purchases = {};
+       }
+       
+       // Ensure purchases is an object
+       if (typeof purchases !== 'object' || purchases === null) {
+           purchases = {};
+       }
+       
+       // Make sure purchases is properly structured
+       if (!purchases || typeof purchases !== 'object') {
+           purchases = {};
+       }
+       if (!purchases[user.email]) {
+           purchases[user.email] = [];
+       }
+       
+       // Create purchase records for each cart item
+       cart.forEach(item => {
+           const purchase = {
+               id: Date.now() + Math.random(),  // Consider a better unique ID generator
+               car: item.car,
+               basePrice: item.basePrice || item.price,
+               quantity: item.quantity,
+               total: item.price * item.quantity,
+               date: new Date().toISOString(),
+               parts: item.parts || [],
+               shippingInfo: {
+                   name: fullName,
+                   email: email,
+                   phone: phone,
+                   address: address,
+                   city: city,
+                   zipCode: zipCode
+               },
+               paymentMethod: document.querySelector('input[name="payment"]:checked')?.value || 'credit_card'
+           };
+           purchases[user.email].push(purchase);  // Fixed: Use 'purchases' instead of 'purchasesData'
+       });
+       
+       // Save purchases to localStorage
+       localStorage.setItem('jdmPurchases', JSON.stringify(purchases));  // Fixed: Use 'purchases' instead of 'purchasesData'
+       
+       // Clear cart
+       cart = [];
+       saveCart();
+       updateCartUI();
+       
+       showSuccessAlert('Purchase completed successfully! You will receive a confirmation email shortly.');
+       closeCheckoutModal();
+       
+       // Reload purchase history if we're on a page that shows it
+       loadPurchaseHistory();
+       
+       // Redirect to member page (which should show history)
+       setTimeout(() => {
+           window.location.href = 'member.html';
+       }, 2000);
+       
+       return false;
+   }
 
 // Close checkout modal
 function closeCheckoutModal() {
@@ -583,7 +633,7 @@ function getCartItemCount() {
 
 // Get cart items (for external use)
 function getCartItems() {
-    return [...cart];
+    return [...cart]; // Return a copy to prevent direct modification
 }
 
 // Check if cart is empty
@@ -693,12 +743,18 @@ function ensureModalScroll() {
         if (modal) {
             const content = modal.querySelector('.modal-content');
             if (content) {
+                // Ensure scrolling is enabled
                 content.style.overflowY = 'auto';
                 content.style.maxHeight = '85vh';
             }
         }
     });
 }
+
+// Call this on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(ensureModalScroll, 500);
+});
 
 // Create parts customization modal if it doesn't exist
 function createPartsCustomizationModal() {
@@ -818,13 +874,14 @@ function loadPartsForCar(carName) {
         });
     });
     
-    // Create part cards
+    // Create part cards with INLINE STYLES
     parts.forEach(part => {
         const partCard = document.createElement('div');
         partCard.className = 'part-card-customization';
         partCard.setAttribute('data-category', part.category);
         partCard.setAttribute('data-part-id', part.id);
         
+        // Add inline styles for consistent sizing
         partCard.style.cssText = `
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -867,9 +924,11 @@ function loadPartsForCar(carName) {
     // Add event listeners to ALL part select buttons
     setTimeout(() => {
         document.querySelectorAll('.part-select-btn').forEach(button => {
+            // Remove any existing listeners first
             button.replaceWith(button.cloneNode(true));
         });
         
+        // Add fresh event listeners
         document.querySelectorAll('.part-select-btn').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1082,7 +1141,7 @@ function closePartsCustomization() {
     }
 }
 
-// Load and display purchase history - UPDATED FOR JSON STORAGE
+// Load and display purchase history
 function loadPurchaseHistory() {
     console.log('Loading purchase history...');
     
@@ -1102,8 +1161,10 @@ function loadPurchaseHistory() {
     }
     
     const user = getCurrentUser();
-    const purchases = storage.getItem('jdmPurchases') || {};
-    const userPurchases = purchases[user.email] || [];
+    
+    // Load purchases from JSON storage
+    const purchasesData = JSON.parse(localStorage.getItem('jdmPurchases') || '{"version":"1.0","purchases":{}}');
+    const userPurchases = purchasesData.purchases[user.email] || [];
     
     console.log('Found purchases for user:', userPurchases.length);
     
@@ -1172,11 +1233,13 @@ function formatDate(dateString) {
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing cart system...');
+    console.log('DOM loaded, initializing JSON cart system...');
     
+    // Small delay to ensure all other scripts are loaded
     setTimeout(() => {
         initCartSystem();
         
+        // Update global navigation
         if (typeof updateGlobalNavigation === 'function') {
             updateGlobalNavigation();
         }
@@ -1189,6 +1252,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('modal-overlay')) {
             closeCheckoutModal();
             
+            // Also close login modal if needed
             const loginModal = document.getElementById('loginModal');
             if (loginModal && loginModal.style.display === 'flex') {
                 loginModal.style.display = 'none';

@@ -2599,4 +2599,23 @@ body.modal-active .content {
     box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
     border: 1px solid rgba(125, 95, 255, 0.3) !important;
 }
+
+/* Add this to your CSS */
+.category-btn {
+    padding: 12px 24px;
+    border: 2px solid rgba(125, 95, 255, 0.3);
+    background: var(--bg-card);
+    color: var(--text-light);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.category-btn:hover,
+.category-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
 }
