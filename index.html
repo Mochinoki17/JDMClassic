@@ -95,26 +95,7 @@
     </div>
     <p>© 2025 JDM Classic Showroom</p>
   </footer>
-
-  document.addEventListener('DOMContentLoaded', function() {
-      console.log('🔍 DEBUG - Checking login state on index.html');
-      console.log('jdmLoggedIn:', storage.getItem('jdmLoggedIn'));
-      console.log('jdmCurrentUser:', storage.getItem('jdmCurrentUser'));
-      console.log('jdmUsers:', storage.getItem('jdmUsers'));
-      
-      // Force check every second for 5 seconds
-      let checks = 0;
-      const interval = setInterval(() => {
-          checks++;
-          console.log(`🔍 Check ${checks}:`, {
-              loggedIn: storage.getItem('jdmLoggedIn'),
-              user: storage.getItem('jdmCurrentUser')?.email
-          });
-          
-          if (checks >= 5) clearInterval(interval);
-      }, 1000);
-  });
-
+  
   <script src="js/json-storage.js"></script>
   <script src="js/app-core.js"></script>
   <script src="js/auth.js"></script>

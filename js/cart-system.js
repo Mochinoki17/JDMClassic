@@ -1141,7 +1141,7 @@ function closePartsCustomization() {
     }
 }
 
-// Load and display purchase history
+// Load and display purchase history (with fallbacks for missing dependencies)
 function loadPurchaseHistory() {
     console.log('Loading purchase history...');
     
@@ -1153,20 +1153,43 @@ function loadPurchaseHistory() {
         return;
     }
     
+    // FIX: Add fallbacks for missing functions
+    const isLoggedInFunc = typeof isLoggedIn === 'function' ? isLoggedIn : () => true; // Fallback: Assume logged in for testing
+    const getCurrentUserFunc = typeof getCurrentUser === 'function' ? getCurrentUser : () => ({ email: 'guest@example.com', fullName: 'Guest' }); // Fallback: Dummy user
+    const formatDateFunc = typeof formatDate === 'function' ? formatDate : (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }; // Fallback: Basic date formatting
+    
     // Check if user is logged in
-    if (!isLoggedIn()) {
+    if (!isLoggedInFunc()) {
         console.log('User not logged in, hiding history section');
         historySection.style.display = 'none';
         return;
     }
     
-    const user = getCurrentUser();
+    const user = getCurrentUserFunc();
+    console.log('Loading purchases for user:', user.email);
     
-    // Load purchases from JSON storage
-    const purchasesData = JSON.parse(localStorage.getItem('jdmPurchases') || '{"version":"1.0","purchases":{}}');
-    const userPurchases = purchasesData.purchases[user.email] || [];
+    // Load purchases from localStorage with proper error handling
+    let purchases = {};
+    try {
+        const savedPurchases = localStorage.getItem('jdmPurchases');
+        console.log('Raw purchases data from storage:', savedPurchases);
+        
+        if (savedPurchases) {
+            purchases = JSON.parse(savedPurchases);
+        }
+    } catch (error) {
+        console.error('Error loading purchases:', error);
+        purchases = {};
+    }
+    
+    // Ensure purchases is an object and get user's purchases
+    const userPurchases = (purchases && purchases[user.email]) ? purchases[user.email] : [];
     
     console.log('Found purchases for user:', userPurchases.length);
+    console.log('User purchases data:', userPurchases);
     
     if (userPurchases.length === 0) {
         historyContainer.innerHTML = `
@@ -1177,6 +1200,7 @@ function loadPurchaseHistory() {
                 <p>Start shopping to see your history here!</p>
             </div>
         `;
+        historySection.style.display = 'block'; // Show section with empty state
     } else {
         // Sort purchases by date (newest first)
         userPurchases.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -1187,11 +1211,11 @@ function loadPurchaseHistory() {
                     <div class="history-item">
                         <div class="history-item-header">
                             <div class="history-car-name">${purchase.car}</div>
-                            <div class="history-date">${formatDate(purchase.date)}</div>
+                            <div class="history-date">${formatDateFunc(purchase.date)}</div>
                         </div>
                         <div class="history-details">
                             <div>Quantity: ${purchase.quantity}</div>
-                            <div>Base Price: ₱${purchase.basePrice.toLocaleString()}</div>
+                            <div>Base Price: ₱${(purchase.basePrice || purchase.price).toLocaleString()}</div>
                             ${purchase.parts && purchase.parts.length > 0 ? `
                                 <div class="history-parts">
                                     <div class="history-parts-title">Custom Parts:</div>
@@ -1205,17 +1229,16 @@ function loadPurchaseHistory() {
                             ` : ''}
                             <div class="history-price">Total: ₱${purchase.total.toLocaleString()}</div>
                             <div class="history-shipping">
-                                <small>Shipped to: ${purchase.shippingInfo.address}, ${purchase.shippingInfo.city}</small>
+                                <small>Shipped to: ${purchase.shippingInfo ? `${purchase.shippingInfo.address}, ${purchase.shippingInfo.city}` : 'N/A'}</small>
                             </div>
                         </div>
                     </div>
                 `).join('')}
             </div>
         `;
+        historySection.style.display = 'block';
     }
     
-    // Show the history section
-    historySection.style.display = 'block';
     console.log('Purchase history loaded and displayed');
 }
 

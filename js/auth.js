@@ -152,11 +152,99 @@ function deletePurchase(purchaseId, button) {
   }
 }
 
+// FIX: Added loadPurchaseHistory function integrated with getUserPurchases()
+// This ensures the purchase history displays correctly on the page
+function loadPurchaseHistory() {
+    console.log('Loading purchase history...');
+    
+    const historySection = document.getElementById('purchaseHistory');
+    const historyContainer = document.getElementById('historyContainer');
+    
+    if (!historySection || !historyContainer) {
+        console.log('Purchase history elements not found on this page');
+        return;
+    }
+    
+    // Check if user is logged in
+    if (!isLoggedIn()) {
+        console.log('User not logged in, hiding history section');
+        historySection.style.display = 'none';
+        return;
+    }
+    
+    const user = getCurrentUser();
+    console.log('Loading purchases for user:', user.email);
+    
+    // Use getUserPurchases() for consistency
+    const userPurchases = getUserPurchases();
+    
+    console.log('Found purchases for user:', userPurchases.length);
+    console.log('User purchases data:', userPurchases);
+    
+    if (userPurchases.length === 0) {
+        historyContainer.innerHTML = `
+            <div class="no-history">
+                <i class="fas fa-history"></i>
+                <h3>No Purchase History</h3>
+                <p>You haven't made any purchases yet.</p>
+                <p>Start shopping to see your history here!</p>
+            </div>
+        `;
+        historySection.style.display = 'block'; // Show section with empty state
+    } else {
+        // Sort purchases by date (newest first)
+        userPurchases.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        historyContainer.innerHTML = `
+            <div class="history-container">
+                ${userPurchases.map(purchase => `
+                    <div class="history-item">
+                        <div class="history-item-header">
+                            <div class="history-car-name">${purchase.car}</div>
+                            <div class="history-date">${formatDate ? formatDate(purchase.date) : new Date(purchase.date).toLocaleDateString()}</div>
+                        </div>
+                        <div class="history-details">
+                            <div>Quantity: ${purchase.quantity}</div>
+                            <div>Base Price: ₱${(purchase.basePrice || purchase.price).toLocaleString()}</div>
+                            ${purchase.parts && purchase.parts.length > 0 ? `
+                                <div class="history-parts">
+                                    <div class="history-parts-title">Custom Parts:</div>
+                                    ${purchase.parts.map(part => `
+                                        <div class="history-part-item">
+                                            <span>${part.name}</span>
+                                            <span>₱${part.price.toLocaleString()}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                            <div class="history-price">Total: ₱${purchase.total.toLocaleString()}</div>
+                            <div class="history-shipping">
+                                <small>Shipped to: ${purchase.shippingInfo ? `${purchase.shippingInfo.address}, ${purchase.shippingInfo.city}` : 'N/A'}</small>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        historySection.style.display = 'block';
+    }
+    
+    console.log('Purchase history loaded and displayed');
+}
+
+// FIX: Alias displayPurchaseHistory to loadPurchaseHistory for compatibility
+// This ensures deletePurchase() can call it without errors
+function displayPurchaseHistory() {
+    loadPurchaseHistory();
+}
+
 // Make functions globally available
 window.confirmDeletePurchase = confirmDeletePurchase;
 window.deletePurchase = deletePurchase;
 window.removePurchase = removePurchase;
 window.getUserPurchases = getUserPurchases;
+window.loadPurchaseHistory = loadPurchaseHistory; // FIX: Made globally available
+window.displayPurchaseHistory = displayPurchaseHistory; // FIX: Alias for compatibility
 
 function getUserProfile() {
     const currentUser = getCurrentUser();

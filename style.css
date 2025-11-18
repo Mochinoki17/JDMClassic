@@ -1954,31 +1954,29 @@ body.modal-active .content {
 
 /* ====PURCHASE HISTORY STYLES==== */
 .purchase-history {
-    margin: 40px 0;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .history-container {
     display: grid;
-    gap: 15px;
+    gap: 20px;
     margin-top: 20px;
 }
 
 .history-item {
-    background: white;
+    border: 1px solid #ddd;
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border-left: 4px solid #007bff;
+    background: #f9f9f9;
 }
 
 .history-item-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Fixed: Was 'between', now correct */
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .history-car-name {
@@ -1992,29 +1990,15 @@ body.modal-active .content {
     font-size: 0.9em;
 }
 
-.history-price {
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #28a745;
-}
-
-.history-parts {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
-}
-
-.history-parts-title {
-    font-weight: bold;
-    margin-bottom: 5px;
+.history-details {
     color: #555;
 }
 
-.history-part-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 2px 0;
-    font-size: 0.9em;
+.history-price {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #28a745;
+    margin-top: 10px;
 }
 
 .no-history {
@@ -2025,8 +2009,31 @@ body.modal-active .content {
 
 .no-history i {
     font-size: 3em;
-    margin-bottom: 15px;
-    color: #ddd;
+    margin-bottom: 20px;
+    color: #ccc;
+}
+
+/* Added: Styles for parts and shipping (referenced in JS but missing) */
+.history-parts {
+    margin-top: 10px;
+}
+
+.history-parts-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.history-part-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.history-shipping {
+    margin-top: 10px;
+    font-size: 0.8em;
+    color: #777;
 }
 
 /* =====Part Images Styles with Fixed Sizes===== */

@@ -283,8 +283,12 @@
               // If initCartSystem doesn't exist, just update the count
               updateNavigationCartCount();
           }
+
+          // FIX: Added this line to call loadPurchaseHistory() and make the section appear
+          loadPurchaseHistory();
       });
   </script>
+
 
   <!-- GUARANTEED STORAGE FALLBACK -->
   <script>
